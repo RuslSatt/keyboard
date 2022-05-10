@@ -3,12 +3,12 @@ import '../styles/style.scss';
 import keys from './keys'
 
 class KeyCode {
-    constructor(keys) {
+    constructor() {
         this.elements = {
             keyboard: null,
             keyboardContainer: null,
             value: '',
-
+            keysAll: [],
         };
         this.keys = keys;
         this.isCaps = false;
@@ -23,14 +23,15 @@ class KeyCode {
         this.elements.keyboardContainer.classList.add('keyboard__container');
 
         document.body.append(this.elements.keyboard);
+        this.elements.keyboardContainer.append(this.render())
         this.elements.keyboard.append(this.elements.keyboardContainer);
 
-        this.elements.keyboardContainer.append(this.render())
+        this.elements.keysAll = document.querySelectorAll('.keyboard__key');
+
     }
 
     render() {
         const keysRender = document.createDocumentFragment();
-        this.keys = keys;
 
         this.keys.forEach((key) => {
             let keyboardKey = document.createElement('button');
@@ -39,16 +40,6 @@ class KeyCode {
 
             !this.isCaps ? keyboardKey.innerHTML = key.ru :
                 keyboardKey.innerHTML = key.shiftRu
-
-            if (this.isCaps) {
-                this.isShift ? keyboardKey.innerHTML = key.ru :
-                    keyboardKey.innerHTML = key.shiftRu;
-            } else {
-                this.isShift ? keyboardKey.innerHTML = key.shiftRu :
-                    keyboardKey.innerHTML = key.ru;
-            }
-
-
 
             keysRender.append(keyboardKey);
 
@@ -73,7 +64,6 @@ class KeyCode {
                     keyboardKey.classList.add('caps');
 
                     keyboardKey.addEventListener('click', () => {
-                        this.isCaps ? this.isCaps = false : this.isCaps = true;
                         this.capsLock()
                     })
                     break
@@ -114,37 +104,66 @@ class KeyCode {
         return keysRender;
 
     }
-
+    upperCase() {
+        this.keys.forEach((key, index) => {
+            this.elements.keysAll[index].innerText = key.shiftRu
+        })
+    }
+    lowerCase() {
+        this.keys.forEach((key, index) => {
+            this.elements.keysAll[index].innerText = key.ru
+        })
+    }
     capsLock() {
-        const keyboard = document.querySelector('.keyboard');
-        keyboard.remove();
-        this.init()
+        this.isCaps ? this.isCaps = false : this.isCaps = true;
+        if (this.isCaps) {
+            this.upperCase();
+        } else {
+            this.lowerCase();
+        }
+    }
+
+    shift() {
+        if (this.isCaps) {
+            if (this.isShift) {
+                this.lowerCase();
+            } else {
+                this.upperCase();
+            }
+        } else {
+            if (this.isShift) {
+                this.upperCase();
+            } else {
+                this.lowerCase();
+            }
+        }
     }
 
     keyDown() {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'CapsLock') {
                 e.preventDefault()
-                this.isCaps ? this.isCaps = false : this.isCaps = true;
                 this.capsLock();
 
             }
-            if (e.code === 'ShiftLeft'){
+            if (e.code === 'ShiftLeft') {
                 e.preventDefault()
                 const shift = document.querySelector('.shift_left');
                 shift.classList.add('active');
                 this.isShift = true;
-                this.capsLock()
+                this.shift()
             }
         })
     }
 
     keyUp() {
         document.addEventListener('keyup', (e) => {
-            if (e.code === 'ShiftLeft'){
+            if (e.code === 'ShiftLeft') {
                 e.preventDefault()
                 this.isShift = false;
-                this.capsLock()
+                const shift = document.querySelector('.shift_left');
+                shift.classList.remove('active');
+                this.shift()
             }
         })
     }
