@@ -14,10 +14,11 @@ class KeyCode {
         this.keys = keys;
         this.isCaps = false;
         this.isShift = false;
-        this.lang = false;
+        this.lang = 'ru';
     }
 
     init() {
+        this.getLocalStorage();
         this.elements.keyboard = document.createElement('div');
         this.elements.keyboardContainer = document.createElement('div');
 
@@ -41,8 +42,10 @@ class KeyCode {
 
             keyboardKey.classList.add('keyboard__key')
 
-            !this.isCaps ? keyboardKey.innerHTML = key.ru :
-                keyboardKey.innerHTML = key.shiftRu
+            // !this.isCaps ? keyboardKey.innerHTML = key.ru :
+            //     keyboardKey.innerHTML = key.shiftRu
+
+            this.lang === 'ru' ? keyboardKey.innerHTML = key.ru : keyboardKey.innerHTML = key.en
 
             keysRender.append(keyboardKey);
 
@@ -109,13 +112,35 @@ class KeyCode {
                 default: {
                     keyboardKey.addEventListener('click', () => {
                         if (key.shiftRu.length === 1 && key.ru.length === 1)
-                            if (!this.lang) {
-                                this.value += this.isCaps ? key.shiftRu : key.ru;
+                            if (this.lang === 'ru') {
+                                if (this.isCaps) {
+                                    if (this.isShift) {
+                                        this.value += key.shiftRu.toLowerCase();
+                                    } else {
+                                        this.value += key.ru.toUpperCase();
+                                    }
+                                } else {
+                                    if (this.isShift) {
+                                        this.value += key.shiftRu;
+                                    } else {
+                                        this.value += key.ru;
+                                    }
+                                }
                             } else {
-                                this.value += this.isCaps ? key.shiftEn : key.en;
+                                if (this.isCaps) {
+                                    if (this.isShift) {
+                                        this.value += key.shiftEn.toLowerCase();
+                                    } else {
+                                        this.value += key.en.toUpperCase();
+                                    }
+                                } else {
+                                    if (this.isShift) {
+                                        this.value += key.shiftEn;
+                                    } else {
+                                        this.value += key.en;
+                                    }
+                                }
                             }
-
-                        console.log(this.value)
                         this.setValue();
                     })
                     break
@@ -133,9 +158,11 @@ class KeyCode {
     }
 
     changeLang() {
-        this.lang = !this.lang;
+        this.lang === 'ru' ?
+        this.lang = 'en' : this.lang = 'ru'
+        this.setLocalStorage();
 
-        if (this.lang) {
+        if (this.lang === 'en') {
             if (this.isCaps) {
                 this.lowerCaseEn();
                 this.isCaps = false;
@@ -232,7 +259,7 @@ class KeyCode {
     shift() {
         if (this.isCaps) {
             if (this.isShift) {
-                if (!this.lang) {
+                if (this.lang === 'ru') {
                     this.upperCaseRu();
                     this.lowerCaseText();
                 } else {
@@ -240,7 +267,7 @@ class KeyCode {
                     this.lowerCaseText();
                 }
             } else {
-                if (!this.lang) {
+                if (this.lang === 'ru') {
                     this.lowerCaseRu();
                     this.upperCaseText();
                 } else {
@@ -250,13 +277,13 @@ class KeyCode {
             }
         } else {
             if (this.isShift) {
-                if (!this.lang) {
+                if (this.lang === 'ru') {
                     this.upperCaseRu();
                 } else {
                     this.upperCaseEn();
                 }
             } else {
-                if (!this.lang) {
+                if (this.lang === 'ru') {
                     this.lowerCaseRu();
                 } else {
                     this.lowerCaseEn();
@@ -328,6 +355,16 @@ class KeyCode {
 
     setValue() {
         this.elements.area.value = this.value;
+    }
+
+    setLocalStorage() {
+        localStorage.setItem('lang', this.lang);
+    }
+
+    getLocalStorage() {
+        if (localStorage.getItem('lang')) {
+            this.lang = localStorage.getItem('lang');
+        }
     }
 }
 
