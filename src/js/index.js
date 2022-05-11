@@ -7,12 +7,14 @@ class KeyCode {
         this.elements = {
             keyboard: null,
             keyboardContainer: null,
-            value: '',
+            area: null,
             keysAll: [],
         };
+        this.value = '';
         this.keys = keys;
         this.isCaps = false;
         this.isShift = false;
+        this.lang = false;
     }
 
     init() {
@@ -27,6 +29,7 @@ class KeyCode {
         this.elements.keyboard.append(this.elements.keyboardContainer);
 
         this.elements.keysAll = document.querySelectorAll('.keyboard__key');
+        this.elements.area = document.querySelector('textarea');
 
     }
 
@@ -48,12 +51,16 @@ class KeyCode {
                     keyboardKey.classList.add('backspace');
 
                     keyboardKey.addEventListener('click', () => {
-                        this.elements.value = this.elements.value.substring(0, this.elements.value.length - 1);
+                        this.value = this.value.substring(0, this.value.length - 1);
+                        this.setValue();
                     })
                     break
                 }
                 case 'Tab': {
                     keyboardKey.classList.add('tab');
+                    keyboardKey.addEventListener('click', () => {
+                        this.elements.area.onfocus
+                    })
                     break
                 }
                 case 'Backslash': {
@@ -70,27 +77,47 @@ class KeyCode {
                 }
                 case 'Enter': {
                     keyboardKey.classList.add('enter');
+                    keyboardKey.addEventListener('click', () => {
+                        this.enterEvent()
+                    })
                     break
                 }
                 case 'ShiftLeft': {
-                    if (this.isShift) {
-                        keyboardKey.classList.add('shift_left');
-                        keyboardKey.classList.add('active');
-                    } else {
-                        keyboardKey.classList.add('shift_left')
-                    }
+                    keyboardKey.classList.add('shift_left');
+                    this.shiftEvent(keyboardKey);
                     break
                 }
                 case 'ShiftRight': {
                     keyboardKey.classList.add('shift_right');
+                    this.shiftEvent(keyboardKey);
                     break
                 }
                 case 'Space': {
                     keyboardKey.classList.add('space');
+                    keyboardKey.addEventListener('click', () => {
+                        this.spaceEvent()
+                    })
                     break
                 }
                 case 'Lang': {
+                    keyboardKey.addEventListener('click', () => {
+                        this.changeLang();
+                    })
                     keyboardKey.classList.add('lang');
+                    break
+                }
+                default: {
+                    keyboardKey.addEventListener('click', () => {
+                        if (key.shiftRu.length === 1 && key.ru.length === 1)
+                            if (!this.lang) {
+                                this.value += this.isCaps ? key.shiftRu : key.ru;
+                            } else {
+                                this.value += this.isCaps ? key.shiftEn : key.en;
+                            }
+
+                        console.log(this.value)
+                        this.setValue();
+                    })
                     break
                 }
             }
@@ -105,15 +132,89 @@ class KeyCode {
 
     }
 
-    upperCase() {
+    changeLang() {
+        this.lang = !this.lang;
+
+        if (this.lang) {
+            if (this.isCaps) {
+                this.lowerCaseEn();
+                this.isCaps = false;
+                this.capsLock();
+            } else {
+                this.lowerCaseEn();
+            }
+        } else {
+            if (this.isCaps) {
+                this.lowerCaseRu();
+                this.isCaps = false;
+                this.capsLock();
+            } else {
+                this.lowerCaseRu();
+            }
+        }
+    }
+
+    enterEvent() {
+        this.value += '\n';
+        this.setValue();
+    }
+
+    spaceEvent() {
+        this.value += ' ';
+        this.setValue();
+    }
+
+
+    shiftEvent(keyboardKey) {
+        keyboardKey.addEventListener('pointerdown', () => {
+            keyboardKey.classList.add('active');
+            this.isShift = true;
+            this.shift();
+        })
+        keyboardKey.addEventListener('pointerup', () => {
+            keyboardKey.classList.remove('active');
+            this.isShift = false;
+            this.shift();
+        })
+    }
+
+    upperCaseRu() {
         this.keys.forEach((key, index) => {
             this.elements.keysAll[index].innerText = key.shiftRu
         })
     }
 
-    lowerCase() {
+    upperCaseText() {
+        this.elements.keysAll.forEach(key => {
+            if (key.innerText.length === 1) {
+                key.innerText = key.innerText.toUpperCase();
+            }
+        })
+    }
+
+    lowerCaseText() {
+        this.elements.keysAll.forEach(key => {
+            if (key.innerText.length === 1) {
+                key.innerText = key.innerText.toLowerCase();
+            }
+        })
+    }
+
+    upperCaseEn() {
+        this.keys.forEach((key, index) => {
+            this.elements.keysAll[index].innerText = key.shiftEn
+        })
+    }
+
+    lowerCaseRu() {
         this.keys.forEach((key, index) => {
             this.elements.keysAll[index].innerText = key.ru
+        })
+    }
+
+    lowerCaseEn() {
+        this.keys.forEach((key, index) => {
+            this.elements.keysAll[index].innerText = key.en
         })
     }
 
@@ -131,46 +232,102 @@ class KeyCode {
     shift() {
         if (this.isCaps) {
             if (this.isShift) {
-                this.lowerCase();
+                if (!this.lang) {
+                    this.upperCaseRu();
+                    this.lowerCaseText();
+                } else {
+                    this.upperCaseEn();
+                    this.lowerCaseText();
+                }
             } else {
-                this.upperCase();
+                if (!this.lang) {
+                    this.lowerCaseRu();
+                    this.upperCaseText();
+                } else {
+                    this.lowerCaseEn();
+                    this.upperCaseText();
+                }
             }
         } else {
             if (this.isShift) {
-                this.upperCase();
+                if (!this.lang) {
+                    this.upperCaseRu();
+                } else {
+                    this.upperCaseEn();
+                }
             } else {
-                this.lowerCase();
+                if (!this.lang) {
+                    this.lowerCaseRu();
+                } else {
+                    this.lowerCaseEn();
+                }
             }
         }
     }
 
     keyDown() {
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'CapsLock') {
-                e.preventDefault()
-                this.capsLock();
-
-            }
-            if (e.code === 'ShiftLeft') {
-                e.preventDefault()
-                const shift = document.querySelector('.shift_left');
-                shift.classList.add('active');
-                this.isShift = true;
-                this.shift()
+            switch (e.code) {
+                case 'CapsLock': {
+                    e.preventDefault();
+                    this.capsLock();
+                    break;
+                }
+                case 'ShiftLeft': {
+                    e.preventDefault()
+                    const shift = document.querySelector('.shift_left');
+                    shift.classList.add('active');
+                    this.isShift = true;
+                    this.shift();
+                    break;
+                }
+                case 'ShiftRight': {
+                    e.preventDefault()
+                    const shift = document.querySelector('.shift_right');
+                    shift.classList.add('active');
+                    this.isShift = true;
+                    this.shift();
+                    break;
+                }
+                case 'Enter': {
+                    e.preventDefault()
+                    this.enterEvent();
+                    break;
+                }
+                case 'Space': {
+                    e.preventDefault();
+                    this.spaceEvent();
+                    break
+                }
             }
         })
     }
 
     keyUp() {
         document.addEventListener('keyup', (e) => {
-            if (e.code === 'ShiftLeft') {
-                e.preventDefault()
-                this.isShift = false;
-                const shift = document.querySelector('.shift_left');
-                shift.classList.remove('active');
-                this.shift()
+            switch (e.code) {
+                case 'ShiftLeft': {
+                    e.preventDefault();
+                    this.isShift = false;
+                    const shift = document.querySelector('.shift_left');
+                    shift.classList.remove('active');
+                    this.shift();
+                    break;
+                }
+                case 'ShiftRight': {
+                    e.preventDefault();
+                    this.isShift = false;
+                    const shift = document.querySelector('.shift_right');
+                    shift.classList.remove('active');
+                    this.shift();
+                    break;
+                }
             }
         })
+    }
+
+    setValue() {
+        this.elements.area.value = this.value;
     }
 }
 

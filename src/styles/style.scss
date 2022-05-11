@@ -66,6 +66,9 @@ textarea {
 
 .shift_right {
   max-width: 140px;
+  &.active {
+    background: aqua;
+  }
 }
 
 .space {
