@@ -104,23 +104,28 @@ class KeyCode {
         return keysRender;
 
     }
+
     upperCase() {
         this.keys.forEach((key, index) => {
             this.elements.keysAll[index].innerText = key.shiftRu
         })
     }
+
     lowerCase() {
         this.keys.forEach((key, index) => {
             this.elements.keysAll[index].innerText = key.ru
         })
     }
+
     capsLock() {
         this.isCaps ? this.isCaps = false : this.isCaps = true;
-        if (this.isCaps) {
-            this.upperCase();
-        } else {
-            this.lowerCase();
-        }
+        this.elements.keysAll.forEach(key => {
+            if (key.innerText.length === 1) {
+                this.isCaps ?
+                    key.innerText = key.innerText.toUpperCase() :
+                    key.innerText = key.innerText.toLowerCase();
+            }
+        })
     }
 
     shift() {
