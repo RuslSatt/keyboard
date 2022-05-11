@@ -195,6 +195,13 @@ const keys = [
         en: '\\',
         shiftRu: '/',
         shiftEn: '|',
+    },
+    {
+        code: 'Delete',
+        ru: 'Del',
+        en: 'Del',
+        shiftRu: 'Del',
+        shiftEn: 'Del',
         br: true,
     },
     {

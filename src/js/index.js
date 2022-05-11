@@ -15,6 +15,7 @@ class KeyCode {
         this.isCaps = false;
         this.isShift = false;
         this.lang = 'ru';
+        this.cursor = 0;
     }
 
     init() {
@@ -32,6 +33,7 @@ class KeyCode {
         this.elements.keysAll = document.querySelectorAll('.keyboard__key');
         this.elements.area = document.querySelector('textarea');
 
+        this.elements.area.value = this.value;
     }
 
     render() {
@@ -42,9 +44,6 @@ class KeyCode {
 
             keyboardKey.classList.add('keyboard__key')
 
-            // !this.isCaps ? keyboardKey.innerHTML = key.ru :
-            //     keyboardKey.innerHTML = key.shiftRu
-
             this.lang === 'ru' ? keyboardKey.innerHTML = key.ru : keyboardKey.innerHTML = key.en
 
             keysRender.append(keyboardKey);
@@ -52,15 +51,21 @@ class KeyCode {
             switch (key.code) {
                 case 'Backspace': {
                     keyboardKey.classList.add('backspace');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
 
-                    keyboardKey.addEventListener('click', () => {
-                        this.value = this.value.substring(0, this.value.length - 1);
-                        this.setValue();
+                    keyboardKey.addEventListener('pointerdown', (e) => {
+                        e.preventDefault()
+                        keyboardKey.classList.add('active');
+                        this.backspaceEvent();
+                    })
+                    keyboardKey.addEventListener('pointerup', () => {
+                        keyboardKey.classList.remove('active');
                     })
                     break
                 }
                 case 'Tab': {
                     keyboardKey.classList.add('tab');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     keyboardKey.addEventListener('click', () => {
                         this.elements.area.onfocus
                     })
@@ -68,11 +73,12 @@ class KeyCode {
                 }
                 case 'Backslash': {
                     keyboardKey.classList.add('backslash');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     break
                 }
                 case 'CapsLock': {
                     keyboardKey.classList.add('caps');
-
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     keyboardKey.addEventListener('click', () => {
                         this.capsLock()
                     })
@@ -80,6 +86,7 @@ class KeyCode {
                 }
                 case 'Enter': {
                     keyboardKey.classList.add('enter');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     keyboardKey.addEventListener('click', () => {
                         this.enterEvent()
                     })
@@ -87,16 +94,19 @@ class KeyCode {
                 }
                 case 'ShiftLeft': {
                     keyboardKey.classList.add('shift_left');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     this.shiftEvent(keyboardKey);
                     break
                 }
                 case 'ShiftRight': {
                     keyboardKey.classList.add('shift_right');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     this.shiftEvent(keyboardKey);
                     break
                 }
                 case 'Space': {
                     keyboardKey.classList.add('space');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     keyboardKey.addEventListener('click', () => {
                         this.spaceEvent()
                     })
@@ -107,10 +117,20 @@ class KeyCode {
                         this.changeLang();
                     })
                     keyboardKey.classList.add('lang');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
+                    break
+                }
+                case 'Delete': {
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        this.value = '';
+                        this.setValue();
+                    })
+                    keyboardKey.classList.add('delete');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     break
                 }
                 default: {
-                    keyboardKey.addEventListener('click', () => {
+                    keyboardKey.addEventListener('pointerdown', () => {
                         if (key.shiftRu.length === 1 && key.ru.length === 1)
                             if (this.lang === 'ru') {
                                 if (this.isCaps) {
@@ -143,6 +163,7 @@ class KeyCode {
                             }
                         this.setValue();
                     })
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     break
                 }
             }
@@ -159,7 +180,7 @@ class KeyCode {
 
     changeLang() {
         this.lang === 'ru' ?
-        this.lang = 'en' : this.lang = 'ru'
+            this.lang = 'en' : this.lang = 'ru'
         this.setLocalStorage();
 
         if (this.lang === 'en') {
@@ -179,6 +200,17 @@ class KeyCode {
                 this.lowerCaseRu();
             }
         }
+    }
+
+    setValue() {
+        console.log(this.elements.area.selectionStart)
+        this.elements.area.selectionStart = this.cursor;
+        this.elements.area.value = this.value;
+    }
+
+    backspaceEvent() {
+        this.value = this.value.substring(0, this.value.length - 1);
+        this.setValue();
     }
 
     enterEvent() {
@@ -292,8 +324,26 @@ class KeyCode {
         }
     }
 
+    keyPress() {
+        document.addEventListener('keypress', (e) => {
+
+            const start = this.elements.area.selectionStart
+            const end = this.elements.area.selectionEnd
+
+            e.preventDefault()
+            this.elements.keysAll.forEach(key => {
+                if (key.dataset.code === e.code) {
+                    key.classList.add('active');
+                    this.value += key.innerText;
+                    this.setValue()
+                }
+            })
+        })
+    }
+
     keyDown() {
         document.addEventListener('keydown', (e) => {
+
             switch (e.code) {
                 case 'CapsLock': {
                     e.preventDefault();
@@ -326,6 +376,34 @@ class KeyCode {
                     this.spaceEvent();
                     break
                 }
+                case 'AltLeft': {
+                    document.addEventListener('keyup', (e) => {
+                        if (e.code === 'ShiftLeft') {
+                            this.changeLang();
+                        }
+                    })
+                    break
+                }
+                case 'Backspace': {
+                    e.preventDefault()
+                    const backspace = document.querySelector('.backspace');
+                    backspace.classList.add('active');
+                    this.backspaceEvent();
+                    break
+                }
+                case 'Delete': {
+                    this.value = '';
+                    this.setValue();
+                    break
+                }
+                default: {
+                    this.elements.keysAll.forEach(key => {
+                        if (key.dataset.code === e.code) {
+                            key.classList.add('active');
+                        }
+                    })
+                    break
+                }
             }
         })
     }
@@ -349,12 +427,21 @@ class KeyCode {
                     this.shift();
                     break;
                 }
+                case 'Backspace': {
+                    const backspace = document.querySelector('.backspace');
+                    backspace.classList.remove('active');
+                    break;
+                }
+                default: {
+                    this.elements.keysAll.forEach(key => {
+                        if (key.dataset.code === e.code) {
+                            key.classList.remove('active');
+                        }
+                    })
+                    break;
+                }
             }
         })
-    }
-
-    setValue() {
-        this.elements.area.value = this.value;
     }
 
     setLocalStorage() {
@@ -375,4 +462,5 @@ window.addEventListener('DOMContentLoaded', () => {
     keyboard.init();
     keyboard.keyDown();
     keyboard.keyUp();
+    keyboard.keyPress();
 })

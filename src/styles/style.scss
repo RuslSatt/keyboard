@@ -1,5 +1,11 @@
 @import 'normalize';
-
+html {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 body {
   display: flex;
   align-items: center;
@@ -17,6 +23,8 @@ textarea {
   resize: none;
   height: 100%;
   max-height: 250px;
+  padding: 20px;
+  font-size: 18px;
 }
 
 .keyboard {
@@ -35,6 +43,9 @@ textarea {
   height: 50px;
   margin-bottom: 5px;
   margin-left: 5px;
+  &.active {
+    background: aqua;
+  }
 }
 
 .backspace {
@@ -42,11 +53,15 @@ textarea {
 }
 
 .tab {
-  max-width: 100px;
+  max-width: 80px;
 }
 
 .backslash {
-  max-width: 100px;
+  max-width: 50px;
+}
+
+.delete {
+  max-width: 65px;
 }
 
 .caps {
