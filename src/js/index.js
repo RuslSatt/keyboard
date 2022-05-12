@@ -149,7 +149,7 @@ class KeyCode {
                                 }
                             } else {
                                 if (this.isCaps) {
-                                if (this.isShift) {
+                                    if (this.isShift) {
                                         substring(key.shiftEn.toLowerCase())
                                     } else {
                                         substring(key.en.toUpperCase())
@@ -190,6 +190,8 @@ class KeyCode {
                 this.lowerCaseEn();
                 this.isCaps = false;
                 this.capsLock();
+            } else if (!this.isCaps && this.isShift) {
+                this.upperCaseEn();
             } else {
                 this.lowerCaseEn();
             }
@@ -198,6 +200,8 @@ class KeyCode {
                 this.lowerCaseRu();
                 this.isCaps = false;
                 this.capsLock();
+            } else if (!this.isCaps && this.isShift) {
+                this.upperCaseRu();
             } else {
                 this.lowerCaseRu();
             }
