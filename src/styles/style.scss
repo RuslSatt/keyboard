@@ -30,11 +30,22 @@ textarea {
   resize: none;
   height: 100%;
   max-height: 250px;
+  min-height: 200px;
   padding: 20px;
   font-size: 30px;
   line-height: 100%;
   letter-spacing: normal;
   box-shadow: 0 0 0 2px #ac999f, 0 0.625em 15px 0 #c2c1c1;
+}
+
+p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: -2rem;
+  margin-top: -2rem;
 }
 
 .keyboard {
