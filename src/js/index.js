@@ -19,6 +19,7 @@ class KeyCode {
         this.activeCapsDown = false;
         this.langFlag = false;
         this.crtlActive = false;
+        this.onShift = false;
     }
 
     init() {
@@ -276,9 +277,11 @@ class KeyCode {
             this.shift();
         })
         keyboardKey.addEventListener('pointerleave', () => {
+            if (!this.onShift) { 
             keyboardKey.classList.remove('active');
             this.isShift = false;
             this.shift();
+            }
         })
     }
 
@@ -406,6 +409,7 @@ class KeyCode {
                 }
             } else if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
                 e.preventDefault();
+                this.onShift = true;
                 this.isShift = true;
                 this.shift();
             } else if (e.code === 'Enter') {
@@ -448,6 +452,7 @@ class KeyCode {
                 } 
             })
             if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+                this.onShift = false;
                 this.isShift = false;
                 this.shift();
             } else if (e.code === 'AltLeft') {
