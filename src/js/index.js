@@ -52,7 +52,9 @@ class KeyCode {
             keysRender.append(keyboardKey);
 
             document.addEventListener('pointerup', () => {
-                keyboardKey.classList.remove('active');
+                if (!keyboardKey.classList.contains('caps')) {
+                    keyboardKey.classList.remove('active');
+                }
             })
             const pointerUp = () => {
                 keyboardKey.addEventListener('pointerup', () => {
