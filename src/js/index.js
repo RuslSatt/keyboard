@@ -17,6 +17,8 @@ class KeyCode {
         this.lang = 'ru';
         this.activeCaps = false;
         this.activeCapsDown = false;
+        this.langFlag = false;
+        this.crtlActive = false;
     }
 
     init() {
@@ -49,6 +51,15 @@ class KeyCode {
 
             keysRender.append(keyboardKey);
 
+            document.addEventListener('pointerup', () => {
+                keyboardKey.classList.remove('active');
+            })
+            const pointerUp = () => {
+                keyboardKey.addEventListener('pointerup', () => {
+                    keyboardKey.classList.remove('active');
+                })
+            }
+
             switch (key.code) {
                 case 'Backspace': {
                     keyboardKey.classList.add('backspace');
@@ -59,9 +70,7 @@ class KeyCode {
                         keyboardKey.classList.add('active');
                         this.backspaceEvent();
                     })
-                    keyboardKey.addEventListener('pointerup', () => {
-                        keyboardKey.classList.remove('active');
-                    })
+                    pointerUp();
                     break
                 }
                 case 'Tab': {
@@ -69,24 +78,9 @@ class KeyCode {
                     keyboardKey.setAttribute('data-code', `${key.code}`)
                     keyboardKey.addEventListener('pointerdown', () => {
                         keyboardKey.classList.add('active');
-                        this.elements.area.onfocus
+                        this.tabEvent();
                     })
-                    keyboardKey.addEventListener('pointerup', () => {
-                        keyboardKey.classList.remove('active');
-                    })
-                    break
-                }
-                case 'Backslash': {
-                    keyboardKey.classList.add('backslash');
-                    keyboardKey.setAttribute('data-code', `${key.code}`)
-                    keyboardKey.addEventListener('pointerdown', () => {
-                        keyboardKey.classList.add('active');
-                        this.value += key.ru;
-                        this.setValue();
-                    })
-                    keyboardKey.addEventListener('pointerup', () => {
-                        keyboardKey.classList.remove('active');
-                    })
+                    pointerUp();
                     break
                 }
                 case 'CapsLock': {
@@ -104,9 +98,11 @@ class KeyCode {
                 case 'Enter': {
                     keyboardKey.classList.add('enter');
                     keyboardKey.setAttribute('data-code', `${key.code}`)
-                    keyboardKey.addEventListener('click', () => {
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active');
                         this.enterEvent()
                     })
+                    pointerUp();
                     break
                 }
                 case 'ShiftLeft': {
@@ -124,48 +120,61 @@ class KeyCode {
                 case 'Space': {
                     keyboardKey.classList.add('space');
                     keyboardKey.setAttribute('data-code', `${key.code}`)
-                    keyboardKey.addEventListener('click', () => {
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active');
                         this.spaceEvent()
-                    })
+                    });
+                    pointerUp();
                     break
                 }
                 case 'Lang': {
-                    keyboardKey.addEventListener('click', () => {
-                        this.changeLang();
-                    })
                     keyboardKey.classList.add('lang');
                     keyboardKey.setAttribute('data-code', `${key.code}`)
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active')
+                        this.changeLang();
+                    })
+                    pointerUp();
                     break
                 }
                 case 'Delete': {
                     keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active')
                         this.value = '';
                         this.setValue();
                     })
+                    pointerUp();
                     keyboardKey.classList.add('delete');
-                    keyboardKey.setAttribute('data-code', `${key.code}`)
+                    keyboardKey.setAttribute('data-code', `${key.code}`);
                     break
                 }
                 case 'AltRight': {
-                    keyboardKey.classList.add('alt_right')
+                    keyboardKey.classList.add('alt_right');
+                    keyboardKey.setAttribute('data-code', `${key.code}`);
                     keyboardKey.addEventListener('pointerdown', () => {
                         keyboardKey.classList.add('active')
                     })
-                    keyboardKey.addEventListener('pointerup', () => {
-                        keyboardKey.classList.remove('active')
-                    })
-                    keyboardKey.setAttribute('data-code', `${key.code}`)
+                    pointerUp();
+                
                     break
                 }
                 case 'AltLeft': {
-                    keyboardKey.classList.add('alt_left')
+                    keyboardKey.classList.add('alt_left');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
                     keyboardKey.addEventListener('pointerdown', () => {
                         keyboardKey.classList.add('active')
                     })
-                    keyboardKey.addEventListener('pointerup', () => {
-                        keyboardKey.classList.remove('active')
-                    })
+                    pointerUp();
+                    
+                    break
+                }
+                case 'ControlLeft': {
+                    keyboardKey.classList.add('ctrl_left');
                     keyboardKey.setAttribute('data-code', `${key.code}`)
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active')
+                    })
+                    pointerUp();
                     break
                 }
                 default: {
@@ -258,14 +267,26 @@ class KeyCode {
         this.elements.area.value = this.value;
     }
 
+    tabEvent() {
+        const area = this.elements.area;
+        const start = area.selectionStart;
+        const end = area.selectionEnd;
+
+        this.value = this.value.substring(0, start)
+        + '\t' + this.value.substring(end);
+        this.setValue();
+        area.focus();
+        area.selectionEnd = end + 1;
+    }
+
     backspaceEvent() {
         const area = this.elements.area;
         const start = area.selectionStart;
         const end = area.selectionEnd;
 
-        this.value = this.value.substring(0, start > 0 ? 
+        this.value = this.value.substring(0, start > 0 && start === end ? 
             start - 1 : start)
-        + this.value.substring(start);
+        + this.value.substring(end);
         this.setValue();
         area.focus();
         area.selectionEnd = start > 0 ? 
@@ -447,12 +468,16 @@ class KeyCode {
                     break;
                 }
                 case 'Enter': {
-                    e.preventDefault()
+                    e.preventDefault();
+                    const enter = document.querySelector('.enter');
+                    enter.classList.add('active');
                     this.enterEvent();
                     break;
                 }
                 case 'Space': {
                     e.preventDefault();
+                    const space = document.querySelector('.space');
+                    space.classList.add('active');
                     this.spaceEvent();
                     break
                 }
@@ -460,17 +485,25 @@ class KeyCode {
                     e.preventDefault()
                     const altLeft = document.querySelector('.alt_left');
                     altLeft.classList.add('active');
-                    document.addEventListener('keyup', (e) => {
-                        if (e.code === 'ControlLeft') {
+                    this.langFlag = true;
+                    break
+                }
+                case 'ControlLeft': {
+                    e.preventDefault();
+                    const controlLeft = document.querySelector('.ctrl_left');
+                    controlLeft.classList.add('active');
+                    if (!this.crtlActive) {
+                        if (this.langFlag) {
                             this.changeLang();
+                            this.crtlActive = true;
                         }
-                    })
+                    }
                     break
                 }
                 case 'AltRight': {
+                    e.preventDefault()
                     const altRight = document.querySelector('.alt_right');
                     altRight.classList.add('active');
-                    e.preventDefault()
                     break
                 }
                 case 'Backspace': {
@@ -481,8 +514,16 @@ class KeyCode {
                     break
                 }
                 case 'Delete': {
+                    const backspace = document.querySelector('.delete');
+                    backspace.classList.add('active');
                     this.value = '';
                     this.setValue();
+                    break
+                }
+                case 'Tab': {
+                    const tab = document.querySelector('.tab');
+                    tab.classList.add('active');
+                    this.tabEvent();
                     break
                 }
                 default: {
@@ -501,7 +542,6 @@ class KeyCode {
         document.addEventListener('keyup', (e) => {
             switch (e.code) {
                 case 'ShiftLeft': {
-                    e.preventDefault();
                     this.isShift = false;
                     const shift = document.querySelector('.shift_left');
                     shift.classList.remove('active');
@@ -509,32 +549,32 @@ class KeyCode {
                     break;
                 }
                 case 'ShiftRight': {
-                    e.preventDefault();
                     this.isShift = false;
                     const shift = document.querySelector('.shift_right');
                     shift.classList.remove('active');
                     this.shift();
                     break;
                 }
-                case 'Backspace': {
-                    const backspace = document.querySelector('.backspace');
-                    backspace.classList.remove('active');
-                    break;
-                }
                 case 'AltLeft': {
-                    e.preventDefault()
                     const backspace = document.querySelector('.alt_left');
                     backspace.classList.remove('active');
+                    this.langFlag = false;
                     break
                 }
                 case 'CapsLock': {
-                    e.preventDefault();
                     const caps = document.querySelector('.caps');
                     this.activeCapsDown = false;
                     this.activeCaps = !this.activeCaps;
                     this.activeCaps ? caps.classList.add('active') : 
                     caps.classList.remove('active') 
                     break;
+                }
+                case 'ControlLeft': {
+                    e.preventDefault();
+                    const controlLeft = document.querySelector('.ctrl_left');
+                    controlLeft.classList.remove('active');
+                    this.crtlActive = false;
+                    break
                 }
                 default: {
                     this.elements.keysAll.forEach(key => {

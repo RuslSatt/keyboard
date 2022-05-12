@@ -1,5 +1,8 @@
 @import 'normalize';
-@import url(https://fonts.googleapis.com/css?family=Indie+Flower:regular);
+@import url(https://fonts.googleapis.com/css?family=Neucha:regular);
+
+
+
 
 html {
   -webkit-touch-callout: none;
@@ -9,14 +12,12 @@ html {
   user-select: none;
 }
 body {
-  font-family: 'Indie Flower', cursive;
+  font-family: 'Neucha';
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
   row-gap: 50px;
-  min-height: 100vh;
-  overflow: hidden;
+  overflow: auto;
   padding: 20px;
 }
 h1 {
@@ -31,6 +32,8 @@ textarea {
   max-height: 250px;
   padding: 20px;
   font-size: 30px;
+  line-height: 100%;
+  letter-spacing: normal;
   box-shadow: 0 0 0 2px #ac999f, 0 0.625em 15px 0 #c2c1c1;
 }
 
@@ -83,6 +86,7 @@ textarea {
   font-size: 30px;
   position: relative;
   width: 100%;
+  height: 100%;
   max-width: 60px;
   height: 60px;
   margin-bottom: 10px;
@@ -114,7 +118,7 @@ textarea {
 }
 
 .tab {
-  max-width: 85px;
+  max-width: 75px;
 }
 
 .backslash {
@@ -154,6 +158,6 @@ textarea {
   transform: translate(0, 0.25em);
   &::before {
     box-shadow: 0 0 0 2px #799fb4, 0 0 #c2c1c1;
-    transform: translate3d(0, 0.2em, -0.5em);
+    transform: translate3d(0, 0.3em, -0.3em);
   }
 }
