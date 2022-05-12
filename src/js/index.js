@@ -326,9 +326,11 @@ class KeyCode {
         this.isCaps ? this.isCaps = false : this.isCaps = true;
         this.elements.keysAll.forEach(key => {
             if (key.innerText.length === 1) {
-                this.isCaps ?
-                    key.innerText = key.innerText.toUpperCase() :
+                if (this.isCaps && this.isShift || !this.isCaps && !this.isShift) {
                     key.innerText = key.innerText.toLowerCase();
+                } else if (this.isCaps && !this.isShift || !this.isCaps && this.isShift) {
+                    key.innerText = key.innerText.toUpperCase();
+                }
             }
         })
     }
@@ -450,8 +452,6 @@ class KeyCode {
                 this.shift();
             } else if (e.code === 'AltLeft') {
                 this.langFlag = false;
-            } else if (e.code === 'CapsLock') {
-                this.activeCapsDown = false;
             } else if (e.code === 'ControlLeft') {
                 this.crtlActive = false;
             } 
