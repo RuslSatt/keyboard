@@ -131,38 +131,51 @@ class KeyCode {
                 }
                 default: {
                     keyboardKey.addEventListener('pointerdown', () => {
+                        const area = this.elements.area;
+                        const start = area.selectionStart;
+                        const end = area.selectionEnd;
+                        const substring = (value) => {
+                            this.value = this.value.substring(0, start)
+                            + value + this.value.substring(end);
+                        }
+                        keyboardKey.classList.add('active');
                         if (key.shiftRu.length === 1 && key.ru.length === 1)
                             if (this.lang === 'ru') {
                                 if (this.isCaps) {
                                     if (this.isShift) {
-                                        this.value += key.shiftRu.toLowerCase();
+                                        substring(key.shiftRu.toLowerCase())
                                     } else {
-                                        this.value += key.ru.toUpperCase();
+                                        substring(key.ru.toUpperCase())
                                     }
                                 } else {
                                     if (this.isShift) {
-                                        this.value += key.shiftRu;
+                                        substring(key.shiftRu)
                                     } else {
-                                        this.value += key.ru;
+                                        substring(key.ru)
                                     }
                                 }
                             } else {
                                 if (this.isCaps) {
                                     if (this.isShift) {
-                                        this.value += key.shiftEn.toLowerCase();
+                                        substring(key.shiftEn.toLowerCase())
                                     } else {
-                                        this.value += key.en.toUpperCase();
+                                        substring(key.en.toUpperCase())
                                     }
                                 } else {
                                     if (this.isShift) {
-                                        this.value += key.shiftEn;
+                                        substring(key.shiftEn)
                                     } else {
-                                        this.value += key.en;
+                                        substring(key.en)
                                     }
                                 }
                             }
-                        this.setValue();
-                    })
+                            this.setValue()
+                            area.focus();
+                            area.selectionEnd = (start === end) ? (end + 1) : end;
+                        })
+                        keyboardKey.addEventListener('pointerup', () => {
+                            keyboardKey.classList.remove('active');
+                        })
                     keyboardKey.setAttribute('data-code', `${key.code}`)
                     break
                 }
@@ -203,24 +216,45 @@ class KeyCode {
     }
 
     setValue() {
-        console.log(this.elements.area.selectionStart)
-        this.elements.area.selectionStart = this.cursor;
         this.elements.area.value = this.value;
     }
 
     backspaceEvent() {
-        this.value = this.value.substring(0, this.value.length - 1);
+        const area = this.elements.area;
+        const start = area.selectionStart;
+        const end = area.selectionEnd;
+
+        this.value = this.value.substring(0, start > 0 ? 
+            start - 1 : start)
+        + this.value.substring(start);
         this.setValue();
+        area.focus();
+        area.selectionEnd = start > 0 ? 
+        end - 1 : end;
     }
 
     enterEvent() {
-        this.value += '\n';
+        const area = this.elements.area;
+        const start = area.selectionStart;
+        const end = area.selectionEnd;
+
+        this.value = this.value.substring(0, start)
+        + '\n' + this.value.substring(end);
         this.setValue();
+        area.focus();
+        area.selectionEnd = end + 1;
     }
 
     spaceEvent() {
-        this.value += ' ';
+        const area = this.elements.area;
+        const start = area.selectionStart;
+        const end = area.selectionEnd;
+
+        this.value = this.value.substring(0, start)
+        + ' ' + this.value.substring(end);
         this.setValue();
+        area.focus();
+        area.selectionEnd = end + 1;
     }
 
 
@@ -326,16 +360,19 @@ class KeyCode {
 
     keyPress() {
         document.addEventListener('keypress', (e) => {
-
-            const start = this.elements.area.selectionStart
-            const end = this.elements.area.selectionEnd
-
+            const area = this.elements.area;
+            const start = area.selectionStart;
+            const end = area.selectionEnd;
             e.preventDefault()
             this.elements.keysAll.forEach(key => {
                 if (key.dataset.code === e.code) {
                     key.classList.add('active');
-                    this.value += key.innerText;
+                
+                    this.value = this.value.substring(0, start)
+                    + key.innerText + this.value.substring(end);
                     this.setValue()
+                    area.focus();
+                    area.selectionEnd = (start === end) ? (end + 1) : end;
                 }
             })
         })
