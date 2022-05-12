@@ -16,6 +16,7 @@ class KeyCode {
         this.isShift = false;
         this.lang = 'ru';
         this.activeCaps = false;
+        this.activeCapsDown = false;
     }
 
     init() {
@@ -142,6 +143,28 @@ class KeyCode {
                         this.setValue();
                     })
                     keyboardKey.classList.add('delete');
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
+                    break
+                }
+                case 'AltRight': {
+                    keyboardKey.classList.add('alt_right')
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active')
+                    })
+                    keyboardKey.addEventListener('pointerup', () => {
+                        keyboardKey.classList.remove('active')
+                    })
+                    keyboardKey.setAttribute('data-code', `${key.code}`)
+                    break
+                }
+                case 'AltLeft': {
+                    keyboardKey.classList.add('alt_left')
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active')
+                    })
+                    keyboardKey.addEventListener('pointerup', () => {
+                        keyboardKey.classList.remove('active')
+                    })
                     keyboardKey.setAttribute('data-code', `${key.code}`)
                     break
                 }
@@ -396,11 +419,15 @@ class KeyCode {
 
     keyDown() {
         document.addEventListener('keydown', (e) => {
-
             switch (e.code) {
                 case 'CapsLock': {
                     e.preventDefault();
-                    this.capsLock();
+                    const caps = document.querySelector('.caps');
+                    caps.classList.add('active');
+                    if (!this.activeCapsDown) {
+                        this.capsLock();
+                        this.activeCapsDown = true;
+                    }
                     break;
                 }
                 case 'ShiftLeft': {
@@ -430,11 +457,20 @@ class KeyCode {
                     break
                 }
                 case 'AltLeft': {
+                    e.preventDefault()
+                    const altLeft = document.querySelector('.alt_left');
+                    altLeft.classList.add('active');
                     document.addEventListener('keyup', (e) => {
-                        if (e.code === 'ShiftLeft') {
+                        if (e.code === 'ControlLeft') {
                             this.changeLang();
                         }
                     })
+                    break
+                }
+                case 'AltRight': {
+                    const altRight = document.querySelector('.alt_right');
+                    altRight.classList.add('active');
+                    e.preventDefault()
                     break
                 }
                 case 'Backspace': {
@@ -483,6 +519,21 @@ class KeyCode {
                 case 'Backspace': {
                     const backspace = document.querySelector('.backspace');
                     backspace.classList.remove('active');
+                    break;
+                }
+                case 'AltLeft': {
+                    e.preventDefault()
+                    const backspace = document.querySelector('.alt_left');
+                    backspace.classList.remove('active');
+                    break
+                }
+                case 'CapsLock': {
+                    e.preventDefault();
+                    const caps = document.querySelector('.caps');
+                    this.activeCapsDown = false;
+                    this.activeCaps = !this.activeCaps;
+                    this.activeCaps ? caps.classList.add('active') : 
+                    caps.classList.remove('active') 
                     break;
                 }
                 default: {
