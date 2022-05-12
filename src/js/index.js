@@ -75,7 +75,8 @@ class KeyCode {
             keysRender.append(keyboardKey);
 
             document.addEventListener('pointerup', () => {
-                if (!keyboardKey.classList.contains('caps')) {
+                if (!keyboardKey.classList.contains('caps') && !keyboardKey.classList.contains('shift_left') &&
+                !keyboardKey.classList.contains('shift_right')) {
                     keyboardKey.classList.remove('active');
                 }
             })
@@ -270,6 +271,11 @@ class KeyCode {
             this.shift();
         })
         keyboardKey.addEventListener('pointerup', () => {
+            keyboardKey.classList.remove('active');
+            this.isShift = false;
+            this.shift();
+        })
+        keyboardKey.addEventListener('pointerleave', () => {
             keyboardKey.classList.remove('active');
             this.isShift = false;
             this.shift();
