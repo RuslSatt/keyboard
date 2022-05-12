@@ -56,12 +56,6 @@ class KeyCode {
                     keyboardKey.classList.remove('active');
                 }
             })
-            const pointerUp = () => {
-                keyboardKey.addEventListener('pointerup', () => {
-                    keyboardKey.classList.remove('active');
-                })
-            }
-
             switch (key.code) {
                 case 'Backspace': {
                     keyboardKey.classList.add('backspace');
@@ -72,7 +66,6 @@ class KeyCode {
                         keyboardKey.classList.add('active');
                         this.backspaceEvent();
                     })
-                    pointerUp();
                     break
                 }
                 case 'Tab': {
@@ -83,7 +76,6 @@ class KeyCode {
                         keyboardKey.classList.add('active');
                         this.tabEvent();
                     })
-                    pointerUp();
                     break
                 }
                 case 'CapsLock': {
@@ -107,7 +99,6 @@ class KeyCode {
                         keyboardKey.classList.add('active');
                         this.enterEvent()
                     })
-                    pointerUp();
                     break
                 }
                 case 'ShiftLeft': {
@@ -130,7 +121,6 @@ class KeyCode {
                         keyboardKey.classList.add('active');
                         this.spaceEvent()
                     });
-                    pointerUp();
                     break
                 }
                 case 'Lang': {
@@ -141,7 +131,6 @@ class KeyCode {
                         keyboardKey.classList.add('active')
                         this.changeLang();
                     })
-                    pointerUp();
                     break
                 }
                 case 'Delete': {
@@ -151,7 +140,6 @@ class KeyCode {
                         this.value = '';
                         this.setValue();
                     })
-                    pointerUp();
                     keyboardKey.classList.add('delete');
                     keyboardKey.setAttribute('data-code', `${key.code}`);
                     break
@@ -163,8 +151,6 @@ class KeyCode {
                         e.preventDefault();
                         keyboardKey.classList.add('active')
                     })
-                    pointerUp();
-                
                     break
                 }
                 case 'AltLeft': {
@@ -174,8 +160,6 @@ class KeyCode {
                         e.preventDefault();
                         keyboardKey.classList.add('active')
                     })
-                    pointerUp();
-                    
                     break
                 }
                 case 'ControlLeft': {
@@ -185,7 +169,6 @@ class KeyCode {
                         e.preventDefault();
                         keyboardKey.classList.add('active')
                     })
-                    pointerUp();
                     break
                 }
                 default: {
