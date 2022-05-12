@@ -301,8 +301,8 @@ class KeyCode {
         + this.value.substring(end);
         this.setValue();
         area.focus();
-        area.selectionEnd = start > 0 ? 
-        end - 1 : end;
+        area.selectionEnd = start > 0 && start === end ? 
+        end - 1 : start;
     }
 
     enterEvent() {
