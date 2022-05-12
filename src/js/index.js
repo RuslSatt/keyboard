@@ -15,7 +15,7 @@ class KeyCode {
         this.isCaps = false;
         this.isShift = false;
         this.lang = 'ru';
-        this.cursor = 0;
+        this.activeCaps = false;
     }
 
     init() {
@@ -66,20 +66,36 @@ class KeyCode {
                 case 'Tab': {
                     keyboardKey.classList.add('tab');
                     keyboardKey.setAttribute('data-code', `${key.code}`)
-                    keyboardKey.addEventListener('click', () => {
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active');
                         this.elements.area.onfocus
+                    })
+                    keyboardKey.addEventListener('pointerup', () => {
+                        keyboardKey.classList.remove('active');
                     })
                     break
                 }
                 case 'Backslash': {
                     keyboardKey.classList.add('backslash');
                     keyboardKey.setAttribute('data-code', `${key.code}`)
+                    keyboardKey.addEventListener('pointerdown', () => {
+                        keyboardKey.classList.add('active');
+                        this.value += key.ru;
+                        this.setValue();
+                    })
+                    keyboardKey.addEventListener('pointerup', () => {
+                        keyboardKey.classList.remove('active');
+                    })
                     break
                 }
                 case 'CapsLock': {
                     keyboardKey.classList.add('caps');
                     keyboardKey.setAttribute('data-code', `${key.code}`)
+                    
                     keyboardKey.addEventListener('click', () => {
+                        this.activeCaps = !this.activeCaps;
+                        this.activeCaps ? keyboardKey.classList.add('active') :
+                        keyboardKey.classList.remove('active');
                         this.capsLock()
                     })
                     break
